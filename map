@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="1">
+ <tileset firstgid="1" source="assetss.tsx"/>
+ <layer id="1" name="ground" width="20" height="20">
+  <data encoding="base64" compression="zstd">
+   JbUv/QAAAcYIpUU94IZBAAEAAJmZmVlXAWQW9QNLG5fAE7eMmrmuvXgYhimj6KXrjmxFGiYyIq+q6lRnH+gm//8fNKMkvvOtAzkAQABFAOvwOFQ5lU950fGcSwAH4H2kPMdx/MZtvAaWX7mV0/iMy3iMwzjRX9zCK5zChEt4hEP40IUedKD/BAvzwLwvz8szYETeECEvyAPyfjwfr8fj8Xa8Lq/IC/FAfNiGp+FleBiejifiBHyAAvD5nut5nnfhBXzLtTzLPByrycXkWnIpuZJcSK4jl5HLRYuLxbXiUnGluFBcJy4TV4mLxDXiRbCIaBC8Bxx4DTwG3gJPgZfAQ+AdsDPPTJlH5o15Yg4nB6cGJwZDj4QeBT0CevTz6MFpwUnBKcFpdEqnOu2Kc8G53tw52TnVOdE5zTnJudxcbS4215pLzZXmQnNFgXI9uZwMKQAAjx7Aoy6fFnxaADiAgUACFBABSIADGAgkQAERgAQ4gIFAAhQQAUiAAxgIJEABEYAEOICBQAIUEAFIgAMYCCJBARGABDiAgTAKFJDBSODTGSCDkcAnNEACI31aAD6BwSg8BDyCwSxChAMACEgUgzlUaJQA6FIdMIkNfEoYwAAA
+  </data>
+ </layer>
+ <layer id="2" name="objectColider" width="20" height="20">
+  <data encoding="base64" compression="zstd">
+   JbUv/QAAAJCgMQAAcgIAAHMCAIUCAACGAgAAhwIAAIi2AgAAt8kCAADKAgAAywIAAMwCABIDAAATAwAhAAMjBRl/IBAAAAIAlQYgmgIcEABIGHCIYQCFRAQSDwAEWYCiAIEAAIIsQAH/ACIAAAIABgAYAGAAAAIAHABwIACBAMACAAYHSCgcIGUOEH8CdCoOfjSmdIA/EALAAAA=
+  </data>
+ </layer>
+ <layer id="3" name="aboveObject" width="20" height="20">
+  <data encoding="base64" compression="zstd">
+   JbUv/QAAAGSgJAAARgIAAEcCAIoCAACLzgIAAM9WAwAAVwMAmgMAAJveAwAA3xYAAzc1lX8ggAAAAQAOABAAcABAZQGIAwAIAFhxQEIABhQPABQA0ACA9wfSpQDQsTjFIzwKAB2LUzzAHwgBwAAA
+  </data>
+ </layer>
+</map>
