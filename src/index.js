@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-import logoImg from "./assets/logo.png";
 import mapPNG from "./assets/assetsmap.png";
 import mapJSON from "./map.json";
 import water from "./assets/water.png";
@@ -9,7 +8,6 @@ import Enemies from "./Enemies";
 import axePNG from "./assets/axe1.png";
 import bigAxePNG from "./assets/bigAxe.png";
 
-import moonMapJSON from "./assets/moon.json";
 
 const config = {
   type: Phaser.AUTO,
@@ -33,6 +31,8 @@ const game = new Phaser.Game(config);
 let player ;
 var cursors ;
 var enemies; 
+const velocity = 250;
+var extraVelocity =0;
 
 var initialTime = 12;
 var time = -1;
@@ -40,6 +40,7 @@ var timeText;
 var timedEvent;
 
 var playerAndAxe = false;
+var bigAxe;
 
 const totalEnemies=10;
 var aliveEnemies = totalEnemies;
@@ -53,7 +54,6 @@ function preload() {
   this.load.image("slime", enemyPNG);
   this.load.image("axe", axePNG);
   this.load.image("bigAxe", bigAxePNG);
-
 }
 
 function create() {
@@ -88,16 +88,14 @@ function create() {
   this.physics.add.collider(this.enemiesGroup, objectCollider);
   this.physics.add.collider(this.enemiesGroup, boundsCollider);
 
-  //AXE
-  //createAxe(this);
-
   //SCORE
-  scoreText = this.add.text(16, 16, '10/10', { fontSize: '50px', fill: '#0ff' });
+  scoreText = this.add.text(16, 16, '10/10', { fontSize: '60px', fill: '#0ff' });
 
   //TIMER
-  this.add.image(300,50,"bigAxe");
-  timeText = this.add.text(350, 16, '0', { fontSize: '50px', fill: '#0ff' });
+  //this.add.image(300,50,"bigAxe");
+  timeText = this.add.text(350, 16, '0', { fontSize: '60px', fill: '#0ff' });
   timedEvent = this.time.addEvent({ delay: 1000, callback: ()=>{updateCounter(this)}, callbackScope: this, loop: true });
+  bigAxe = this.physics.add.sprite(300,16,"bigAxe");
 
 
   const anims = this.anims;
@@ -144,16 +142,20 @@ function update(){
    timeText.setText(time);
   }
 
+  
+
 //keyboard press to move
   if(cursors.left.isDown){
-    player.body.setVelocityX(-200)
+    player.body.setVelocityX(-velocity - extraVelocity)
   }else if (cursors.right.isDown){
-    player.body.setVelocityX(200)
+    player.body.setVelocityX(velocity  + extraVelocity)
   }else if(cursors.up.isDown){
-    player.body.setVelocityY(-200)
+    player.body.setVelocityY(-velocity - extraVelocity)
   }else if(cursors.down.isDown){
-    player.body.setVelocityY(200)
+    player.body.setVelocityY(velocity  + extraVelocity)
   }
+
+  followPlayer(this);
 
   //set animations per key pressed
   if(cursors.left.isDown){
@@ -184,17 +186,17 @@ function getAxe(player,axe){
 }
 
 function updateCounter(t) {
-  console.log(t);
+  console.log(time);
 
-  if(time == -1)
+  if(time == -1){
     createAxe(t);
-
+    time= -2;
+  }
 
   if(playerAndAxe==false)
     return;
 
   if(time == 0){
-    timedEvent.remove();
     playerAndAxe = false;
     createAxe(t);
   }
@@ -212,7 +214,7 @@ function hitEnemy(player, enemy){
 
 }
 
-function createAxe(t){
+function createAxe(t,x,y){
   var x = Phaser.Math.Between(50, 1500);
   var y = Phaser.Math.Between(50, 1500);
 
@@ -225,4 +227,29 @@ function createAxe(t){
     child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
   });
   t.physics.add.overlap(player, axe, getAxe, null, t);
+}
+
+function followPlayer(t){
+
+  var x =player.x -500;
+  var y =player.y -150;
+
+  if(x<0)
+    x = 20;
+
+  if(y<0)
+    y = 20;
+
+  scoreText.x=x;
+  scoreText.y=y;
+
+  timeText.x = x + 370;
+  timeText.y = y;
+
+  bigAxe.x = x + 300;
+  bigAxe.y = y + 30;
+
+  timeText.setDepth(15);
+  bigAxe.setDepth(15);
+  scoreText.setDepth(15);
 }
