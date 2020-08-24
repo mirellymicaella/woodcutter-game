@@ -1,12 +1,12 @@
 class Enemy extends Phaser.Physics.Arcade.Sprite{
 
 
-    constructor(scene,x ,y){
+    constructor(scene,x ,y, id, velocity){
 
         //pegar nosso monstrinho chamado slime para aplicar no game
         super(scene,x,y,'slime', 0)
         this.scene = scene
-
+        this.id = id
 
         // habilitando as fisicas do mundo
         this.scene.physics.world.enable(this)
@@ -16,18 +16,19 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
 
         //setting time to enemy moves
         this.timeEvent = this.scene.time.addEvent({
-            delay: 1500,
+            delay: velocity,
             callback: this.move,
             loop: true,
             callbackScope: this
         })
     }
 
+
     move(){
         const randNumber = Math.floor(Math.random() * 4 + 1)
         switch(randNumber){
             case 1: 
-                this.setVelocityX(100)
+                this.setVelocityX(100 )
                 break
             case 2: 
                 this.setVelocityX(-100)

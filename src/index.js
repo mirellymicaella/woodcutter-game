@@ -4,16 +4,22 @@ import mapJSON from "./map.json";
 import water from "./assets/water.png";
 import playerPNG from "./assets/player5.png";
 import enemyPNG from "./assets/slime.png";
+import enemyIconPNG from "./assets/slimeicon.png";
 import Enemies from "./Enemies";
 import axePNG from "./assets/axe1.png";
 import bigAxePNG from "./assets/bigAxe.png";
+import minimapPNG from "./assets/minimap.png";
+import playerpointPNG from "./assets/playerpoint.png";
+import axepointPNG from "./assets/axepoint.png";
+import enemypointPNG from "./assets/enemypoint.png";
 
+const worldSize = 700;
 
 const config = {
   type: Phaser.AUTO,
   parent: "phaser-example",
-  width: 1550,
-  height: 1550,
+  width: worldSize,
+  height: worldSize,
   physics:{
     default: "arcade",
     arcade: {
@@ -30,9 +36,16 @@ const config = {
 const game = new Phaser.Game(config);
 let player ;
 var cursors ;
-var enemies; 
+var enemies=[]; 
 const velocity = 250;
 var extraVelocity =0;
+var camera;
+var minimap;
+var playerpoint;
+var axepoint;
+var enemiesposition=[];
+var enemiespoint=[];
+var axe;
 
 var initialTime = 12;
 var time = -1;
@@ -42,7 +55,9 @@ var timedEvent;
 var playerAndAxe = false;
 var bigAxe;
 
-const totalEnemies=10;
+var enemyIcon;
+
+const totalEnemies=20;
 var aliveEnemies = totalEnemies;
 var scoreText;
 
@@ -52,8 +67,13 @@ function preload() {
   this.load.tilemapTiledJSON("map", mapJSON);
   this.load.spritesheet("player", playerPNG, {frameWidth:32, frameHeight:60});
   this.load.image("slime", enemyPNG);
+  this.load.image("slimeicon", enemyIconPNG);
   this.load.image("axe", axePNG);
   this.load.image("bigAxe", bigAxePNG);
+  this.load.image("minimap",minimapPNG);
+  this.load.image("playerpoint",playerpointPNG);
+  this.load.image("axepoint",axepointPNG);
+  this.load.image("enemypoint",enemypointPNG);
 }
 
 function create() {
@@ -83,20 +103,28 @@ function create() {
   //ENEMIES
   this.enemies = map.createFromObjects('enemies', 'enemy', {})
   this.enemiesGroup = new Enemies(this.physics.world, this, [], this.enemies)
-
   this.physics.add.collider(this.enemiesGroup, player, hitEnemy, null, this)
   this.physics.add.collider(this.enemiesGroup, objectCollider);
   this.physics.add.collider(this.enemiesGroup, boundsCollider);
 
   //SCORE
-  scoreText = this.add.text(16, 16, '10/10', { fontSize: '60px', fill: '#0ff' });
-
+  scoreText = this.add.text(16, 16, totalEnemies+"/"+totalEnemies, { fontSize: '60px', fill: '#0ff' });
   //TIMER
-  //this.add.image(300,50,"bigAxe");
   timeText = this.add.text(350, 16, '0', { fontSize: '60px', fill: '#0ff' });
   timedEvent = this.time.addEvent({ delay: 1000, callback: ()=>{updateCounter(this)}, callbackScope: this, loop: true });
   bigAxe = this.physics.add.sprite(300,16,"bigAxe");
+  enemyIcon = this.physics.add.sprite(280,16,"slimeicon");
+  minimap = this.physics.add.sprite(900, 40,"minimap");
+  playerpoint = this.physics.add.sprite(0, 0,"playerpoint");
+  axepoint = this.physics.add.sprite(0, 0,"axepoint");
 
+  enemies =this.enemiesGroup.children.entries;
+  var i;
+  for (i=0 ; i<enemies.length;i++)
+    enemiespoint[i]=this.physics.add.sprite(0, 0,"enemypoint");
+
+
+  createAxe(this);
 
   const anims = this.anims;
   anims.create({
@@ -125,15 +153,13 @@ function create() {
   });
 
   //CAMERA
-  const camera = this.cameras.main
+  camera = this.cameras.main
   camera.startFollow(player)
   camera.setBounds(0 , 0 , map.widthInPixels, map.heightInPixels)
 }
 
 function update(){
-  //put here  before your velocity is 0
   const prevVelocity = player.body.velocity.clone()
-  //stop player when stop press the key
   player.body.setVelocity(0);
   cursors = this.input.keyboard.createCursorKeys()
 
@@ -142,7 +168,8 @@ function update(){
    timeText.setText(time);
   }
 
-  
+  followPlayer(this);
+  //timeTextAxes.setText(timeAxes);
 
 //keyboard press to move
   if(cursors.left.isDown){
@@ -154,8 +181,6 @@ function update(){
   }else if(cursors.down.isDown){
     player.body.setVelocityY(velocity  + extraVelocity)
   }
-
-  followPlayer(this);
 
   //set animations per key pressed
   if(cursors.left.isDown){
@@ -182,60 +207,66 @@ function update(){
 function getAxe(player,axe){
   playerAndAxe=true;
   axe.disableBody(true, true);
+  axepoint.disableBody(true,true);
   time = initialTime;
 }
 
 function updateCounter(t) {
-  console.log(time);
-
-  if(time == -1){
-    createAxe(t);
-    time= -2;
-  }
 
   if(playerAndAxe==false)
     return;
 
   if(time == 0){
     playerAndAxe = false;
+  }else if(time == 2){
     createAxe(t);
-  }
-  else 
+    axepoint.enableBody(false, 400,400,true,true);
     time--;
+  }else 
+    time--;
+
 }
 
 function hitEnemy(player, enemy){
   if(playerAndAxe == true){
     enemy.disableBody(true, true);
+    enemiespoint[enemy.id].disableBody(true, true);
     aliveEnemies -= 1;
     scoreText.setText(aliveEnemies + '/' + totalEnemies);
-  }else
+  }else{
     this.scene.restart();
+    time= -1;
+    playerAndAxe=false;
+  }
+
+  if(aliveEnemies==0){
+    this.scene.restart();
+    aliveEnemies = totalEnemies;
+    time= 0;
+  }
 
 }
 
-function createAxe(t,x,y){
+function createAxe(t){
   var x = Phaser.Math.Between(50, 1500);
-  var y = Phaser.Math.Between(50, 1500);
+  var y = Phaser.Math.Between(50, 1450);
 
-  const axe = t.physics.add.group({
-    key: 'axe',
-    repeat: 0,
-    setXY: { x: x, y: y, stepX: 70 }
-  });
-  axe.children.iterate(function (child) {
-    child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-  });
+  axe = t.physics.add.sprite(x,y,"axe");
   t.physics.add.overlap(player, axe, getAxe, null, t);
+  console.log(axe.x);
+
 }
 
 function followPlayer(t){
 
-  var x =player.x -500;
-  var y =player.y -150;
+  var x =player.x -worldSize/2;
+  var y =player.y -worldSize/2 + 20;
 
   if(x<0)
     x = 20;
+
+  if(x>900)
+    x =900;
 
   if(y<0)
     y = 20;
@@ -243,13 +274,39 @@ function followPlayer(t){
   scoreText.x=x;
   scoreText.y=y;
 
-  timeText.x = x + 370;
-  timeText.y = y;
+  enemyIcon.x=x + 220;
+  enemyIcon.y=y + 10;
 
-  bigAxe.x = x + 300;
-  bigAxe.y = y + 30;
+  timeText.x = x + 320;
+  timeText.y = y ;
+
+  bigAxe.x = x + 440;
+  bigAxe.y = y + 25;
+
+  minimap.x = x + 600;
+  minimap.y = y + 30;
+
+  var z = 20;
+
+  playerpoint.x = (minimap.x - 40) + (player.x/z);
+  playerpoint.y = (minimap.y -40 ) + (player.y/z);
+
+  axepoint.x = (minimap.x - 40) +(axe.x/z);
+  axepoint.y = (minimap.y - 40) +(axe.y/z);
+
+  var i;
+  for (i=0 ; i<enemies.length;i++){  
+    enemiespoint[i].x =(minimap.x - 40) + (enemies[i].x/z);
+    enemiespoint[i].y =(minimap.y - 40) + (enemies[i].y/z);
+    enemiespoint[i].setDepth(15);
+  }
 
   timeText.setDepth(15);
   bigAxe.setDepth(15);
   scoreText.setDepth(15);
+  playerpoint.setDepth(15);
+  axepoint.setDepth(15);
+  enemyIcon.setDepth(15);
+  minimap.setDepth(15);
+
 }
