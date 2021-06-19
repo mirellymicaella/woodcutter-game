@@ -8,7 +8,10 @@ Você é um lenhador e deve encontrar os machados e matar os lobos!
 ℹ Como jogar
 ```
 # Clone este repositório
-$ git clone https://gitlab.com/petengcomp/mobile/qrcode-2.0.git
+$ git clone https://github.com/mirellymicaella/woodcutter-game.git
+
+# Navegue até o diretório do projeto
+$ cd woodcutter-game
 
 # Instale as dependências do projeto
 $ npm i
