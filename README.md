@@ -3,7 +3,7 @@
 Jogo para navegador usando [Phaser 3](https://phaser.io/phaser3). 
 
 Você é um lenhador e deve encontrar os machados e matar os lobos!
-Oriente-se pelo mini mapa no canto superior direito, encontre o machado e mate os lobos enquantoestiver com a posse do machado.
+Oriente-se pelo mini mapa no canto superior direito, encontre o machado e mate lobos enquanto estiver com a posse do machado.
 Use as setas ⬅⬆⬇➡ para se movimentar.
 
 <p align="center">
